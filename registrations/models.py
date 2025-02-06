@@ -11,16 +11,14 @@ class Registration(models.Model):
     final_rating = models.DecimalField(max_digits=4, decimal_places=2, null=True)
 
     def clean(self):
-        """Validar que el usuario tenga el rol de 'alumno' antes de guardar."""
         if self.student_id.rol != 'alumno':
             raise ValidationError("El usuario debe tener el rol de 'Alumno' para inscribirse en una materia.")
 
     def save(self, *args, **kwargs):
-        self.clean()  # Ejecutar la validación antes de guardar
+        self.clean()  
         super().save(*args, **kwargs)
     
     def is_approved(self):
-        """ Verifica si el estudiante aprobó la materia """
         return self.final_rating is not None and self.final_rating >= 3.0
 
     class Meta:
