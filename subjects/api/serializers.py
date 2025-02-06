@@ -17,19 +17,19 @@ class StudentSubjectsSerializer(serializers.ModelSerializer):
         fields = ['subject_id']
 
 class ApprovedSubjectsSerializer(serializers.ModelSerializer):
-    subject_id = SubjectSerializer()  # Serializar la materia
+    subject_id = SubjectSerializer()
 
     class Meta:
         model = Registration
         fields = ['subject_id', 'final_rating']
 
 class StudentGradeSerializer(serializers.ModelSerializer):
-    student_name = serializers.CharField(source="student_id.username")  # Nombre del estudiante
-    student_email = serializers.CharField(source="student_id.email")    # Email del estudiante
+    student_name = serializers.CharField(source="student_id.username")
+    student_email = serializers.CharField(source="student_id.email")
 
     class Meta:
         model = Registration
-        fields = ['student_name', 'student_email', 'final_rating']  # Incluye la nota final
+        fields = ['student_name', 'student_email', 'final_rating']
 
 class SubjectWithGradesSerializer(serializers.ModelSerializer):
     students = serializers.SerializerMethodField()
@@ -59,8 +59,8 @@ class SubjectWithStudentsSerializer(serializers.ModelSerializer):
         return StudentSerializer(students, many=True).data
     
 class FailedSubjectsSerializer(serializers.ModelSerializer):
-    subject_name = serializers.CharField(source="subject_id.name")  # Nombre de la materia
-    subject_code = serializers.CharField(source="subject_id.code")  # Código de la materia
+    subject_name = serializers.CharField(source="subject_id.name")
+    subject_code = serializers.CharField(source="subject_id.code")
 
     class Meta:
         model = Registration
@@ -69,10 +69,10 @@ class FailedSubjectsSerializer(serializers.ModelSerializer):
 class GradeStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Registration
-        fields = ['student_id', 'final_rating']  # Permite asignar la nota final
+        fields = ['student_id', 'final_rating']
 
 class FinalizeSubjectSerializer(serializers.ModelSerializer):
-    students = GradeStudentSerializer(many=True, write_only=True)  # Lista de estudiantes con notas
+    students = GradeStudentSerializer(many=True, write_only=True)
 
     class Meta:
         model = Subject
@@ -91,6 +91,6 @@ class FinalizeSubjectSerializer(serializers.ModelSerializer):
                 registration.final_rating = student_data['final_rating']
                 registration.save()
 
-        instance.is_finalized = True  # Marcar la materia como finalizada
+        instance.is_finalized = True  # Finalizar Materia
         instance.save()
         return instance

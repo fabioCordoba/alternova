@@ -4,10 +4,10 @@ from users.models import User
 import random
 import string
 
-def generar_codigo(nombre):
-    iniciales = ''.join([palabra[0] for palabra in nombre.split()])[:3].upper()
-    numeros = ''.join(random.choices(string.digits, k=3))
-    return f"{iniciales}-{numeros}"
+def generate_code(name):
+    initials = ''.join([word[0] for word in name.split()])[:3].upper()
+    numbers = ''.join(random.choices(string.digits, k=3))
+    return f"{initials}-{numbers}"
 
 class Subject(models.Model):
     code = models.CharField(max_length=255, unique=True, blank=True)
@@ -18,7 +18,7 @@ class Subject(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            self.code = generar_codigo(self.name)
+            self.code = generate_code(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):

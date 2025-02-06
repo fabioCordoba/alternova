@@ -4,9 +4,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from registrations.api.permissions import IsAlumnoOrReadOnly, IsTeacherOrReadOnly
 from registrations.models import Registration
-from subjects.api.permissions import IsAdminOrReadOnly
+from subjects.api.permissions import IsAdminOrReadOnly, IsAlumnoOrReadOnly, IsTeacherOrReadOnly
 from subjects.api.serializers import ApprovedSubjectsSerializer, FailedSubjectsSerializer, FinalizeSubjectSerializer, StudentSubjectsSerializer, SubjectSerializer, SubjectWithGradesSerializer, SubjectWithStudentsSerializer
 from subjects.models import Subject
 
@@ -16,7 +15,6 @@ class SubjectApiViewSet(ModelViewSet):
     serializer_class = SubjectSerializer
     queryset = Subject.objects.all()
     filter_backends = [OrderingFilter, DjangoFilterBackend]
-    # ordering = ['-created_at']
     filterset_fields = ['name']
 
 class StudentSubjectsView(APIView):
@@ -46,7 +44,7 @@ class ApprovedSubjectsView(APIView):
         return Response(serialized_data)
     
 class TeacherSubjectsView(APIView):
-    permission_classes = [IsTeacherOrReadOnly]  # Solo usuarios autenticados pueden acceder
+    permission_classes = [IsTeacherOrReadOnly]
 
     def get(self, request):
         user = request.user
@@ -60,57 +58,43 @@ class TeacherSubjectsView(APIView):
         return Response(serialized_data)
     
 class StudentsGradesView(APIView):
-    permission_classes = [IsTeacherOrReadOnly]  # Solo usuarios autenticados pueden acceder
+    permission_classes = [IsTeacherOrReadOnly]
 
     def get(self, request):
         user = request.user
 
-        # Verificar que el usuario sea un profesor
         if user.rol != 'profesor':
             return Response({"error": "Solo los profesores pueden ver las calificaciones."}, status=403)
 
-        # Obtener las materias del profesor
         subjects = user.subjects.all()
-
-        # Serializar los datos
         serialized_data = SubjectWithGradesSerializer(subjects, many=True).data
 
         return Response(serialized_data)
     
 class StudentsPerSubjectView(APIView):
-    permission_classes = [IsTeacherOrReadOnly]  # Solo usuarios autenticados pueden acceder
+    permission_classes = [IsTeacherOrReadOnly]
 
     def get(self, request):
         user = request.user
-
-        # Verificar que el usuario sea un profesor
         if user.rol != 'profesor':
             return Response({"error": "Solo los profesores pueden ver la lista de estudiantes."}, status=403)
 
-        # Obtener las materias del profesor
         subjects = user.subjects.all()
-
-        # Serializar los datos
         serialized_data = SubjectWithStudentsSerializer(subjects, many=True).data
 
         return Response(serialized_data)
     
 class FailedSubjectsView(APIView):
-    permission_classes = [IsTeacherOrReadOnly]  # Solo usuarios autenticados pueden acceder
+    permission_classes = [IsTeacherOrReadOnly]
 
     def get(self, request):
         user = request.user
-
-        # Verificar que el usuario sea un estudiante
         if user.rol != 'alumno':
             return Response({"error": "Solo los estudiantes pueden ver sus materias reprobadas."}, status=403)
 
-        # Obtener las materias reprobadas del estudiante (nota < 3.0)
         failed_subjects = Registration.objects.filter(student_id=user, final_rating__lt=3.0)
-
-        # Serializar los datos
         serialized_data = FailedSubjectsSerializer(failed_subjects, many=True).data
-
+        
         return Response(serialized_data)
     
 class FinalizeSubjectView(APIView):
