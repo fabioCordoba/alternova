@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:14.3
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: alternova-db
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password
+    ports:
+      - 5433:5432
+    networks:
+      - alt-network
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  backend-django-alternova:
+    image: fabiocordobadev/personal:backend-django-alternova
+    container_name: backend-django-alternova
+    restart: always
+    ports:
+      - 8110:8000
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: alternova-db
+      DATABASE_USER: db_user
+      DATABASE_PASSWORD: db_password
+    networks:
+      - alt-network
+networks:
+  alt-network:
+
+
+volumes:
+  dbdata:

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +26,17 @@ SECRET_KEY = 'django-insecure-6*_!@b50lq1wm^l&j3%_qdfx7^r)87dztznx=w$ksk$eomp3^t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF_TRUSTED_ORIGINS = ['https://blog.fabiocordoba.xyz']
+
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -39,12 +49,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
     'users',
     'subjects',
     'registrations'
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -83,12 +95,20 @@ DATABASES = {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'alternova-db',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'admin',
+    #     'HOST': '192.168.1.1',  # Cambia si usas un servidor remoto
+    #     'PORT': '5432',       # Puerto por defecto de PostgreSQL
+    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'alternova-db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',  # Cambia si usas un servidor remoto
+        'NAME': os.getenv('DATABASE_NAME', 'alternova-db'),
+        'USER': os.getenv('DATABASE_USER', 'db_user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'db_password'),
+        'HOST': os.getenv('DATABASE_HOST', 'db'), 
         'PORT': '5432',       # Puerto por defecto de PostgreSQL
     }
 }
