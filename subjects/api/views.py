@@ -119,7 +119,6 @@ class FinalizeSubjectView(APIView):
     def patch(self, request, subject_id):
         user = request.user
 
-        # Verificar que el usuario sea un profesor
         if user.rol != 'profesor':
             return Response({"error": "Solo los profesores pueden finalizar materias."}, status=403)
 
