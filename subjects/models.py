@@ -12,8 +12,9 @@ def generar_codigo(nombre):
 class Subject(models.Model):
     code = models.CharField(max_length=255, unique=True, blank=True)
     name = models.CharField(max_length=255)
-    teacher_id = models.ForeignKey(User, on_delete=CASCADE, null=True)
+    teacher_id = models.ForeignKey(User, on_delete=CASCADE, null=True, related_name="subjects")
     prerequisitos = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='materias_dependientes')
+    is_finalized = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.code:
