@@ -91,26 +91,22 @@ WSGI_APPLICATION = 'alternova.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # },
-    'default': {
+    'dev': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'alternova-db',
         'USER': 'postgres',
         'PASSWORD': 'admin',
-        'HOST': 'localhost',  # Cambia si usas un servidor remoto
-        'PORT': '5432',       # Puerto por defecto de PostgreSQL
+        'HOST': 'localhost',  
+        'PORT': '5432',       
+    },
+    'default': {# Prod
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DATABASE_NAME', 'alternova-db'),
+        'USER': os.getenv('DATABASE_USER', 'db_user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'db_password'),
+        'HOST': os.getenv('DATABASE_HOST', 'db'), 
+        'PORT': '5432',    
     }
-    # 'default': {# Prod
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.getenv('DATABASE_NAME', 'alternova-db'),
-    #     'USER': os.getenv('DATABASE_USER', 'db_user'),
-    #     'PASSWORD': os.getenv('DATABASE_PASSWORD', 'db_password'),
-    #     'HOST': os.getenv('DATABASE_HOST', 'db'), 
-    #     'PORT': '5432',       # Puerto por defecto de PostgreSQL
-    # }
 }
 
 

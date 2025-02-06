@@ -3,6 +3,8 @@ from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from registrations.models import Registration
 from subjects.api.permissions import IsAdminOrReadOnly, IsAlumnoOrReadOnly, IsTeacherOrReadOnly
@@ -20,6 +22,15 @@ class SubjectApiViewSet(ModelViewSet):
 class StudentSubjectsView(APIView):
     permission_classes = [IsAlumnoOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Obtain list of registered subjects",
+        operation_description="Returns the list of subjects in which the authenticated student is enrolled. Only students can access.",
+        responses={
+            200: StudentSubjectsSerializer(many=True),
+            403: openapi.Response("Solo los alumnos pueden ver sus materias inscritas."),
+            401: "No autenticado. Se requiere un token JWT."
+        }
+    )
     def get(self, request):
         user = request.user
         if user.rol != 'alumno':
@@ -33,6 +44,15 @@ class StudentSubjectsView(APIView):
 class ApprovedSubjectsView(APIView):
     permission_classes = [IsAlumnoOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Obtain approved subjects",
+        operation_description="Returns the list of passed subjects of the authenticated student (grade >= 3.0).",
+        responses={
+            200: ApprovedSubjectsSerializer(many=True),
+            403: openapi.Response("Solo los alumnos pueden ver sus materias aprobadas."),
+            401: "No autenticado. Se requiere un token JWT."
+        }
+    )
     def get(self, request):
         user = request.user
 
@@ -46,6 +66,15 @@ class ApprovedSubjectsView(APIView):
 class TeacherSubjectsView(APIView):
     permission_classes = [IsTeacherOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Obtain subjects assigned to a teacher",
+        operation_description="Returns the list of subjects assigned to the authenticated teacher.",
+        responses={
+            200: SubjectSerializer(many=True),
+            403: openapi.Response("Solo los profesores pueden ver sus materias."),
+            401: "No autenticado. Se requiere un token JWT."
+        }
+    )
     def get(self, request):
         user = request.user
 
@@ -60,6 +89,15 @@ class TeacherSubjectsView(APIView):
 class StudentsGradesView(APIView):
     permission_classes = [IsTeacherOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Obtain student grades",
+        operation_description="Returns students' grades in the authenticated teacher's subjects.",
+        responses={
+            200: SubjectWithGradesSerializer(many=True),
+            403: openapi.Response("Solo los profesores pueden ver las calificaciones."),
+            401: "No autenticado. Se requiere un token JWT."
+        }
+    )
     def get(self, request):
         user = request.user
 
@@ -74,6 +112,15 @@ class StudentsGradesView(APIView):
 class StudentsPerSubjectView(APIView):
     permission_classes = [IsTeacherOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Obtain students by subject",
+        operation_description="Returns the list of students in each subject assigned to the authenticated teacher.",
+        responses={
+            200: SubjectWithStudentsSerializer(many=True),
+            403: openapi.Response("Solo los profesores pueden ver la lista de estudiantes."),
+            401: "No autenticado. Se requiere un token JWT."
+        }
+    )
     def get(self, request):
         user = request.user
         if user.rol != 'profesor':
@@ -87,6 +134,15 @@ class StudentsPerSubjectView(APIView):
 class FailedSubjectsView(APIView):
     permission_classes = [IsTeacherOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Obtaining failed subjects",
+        operation_description="Returns the list of failed subjects of the authenticated student (grade < 3.0).",
+        responses={
+            200: FailedSubjectsSerializer(many=True),
+            403: openapi.Response("Solo los alumnos pueden ver sus materias reprobadas."),
+            401: "No autenticado. Se requiere un token JWT."
+        }
+    )
     def get(self, request):
         user = request.user
         if user.rol != 'alumno':
@@ -100,6 +156,17 @@ class FailedSubjectsView(APIView):
 class FinalizeSubjectView(APIView):
     permission_classes = [IsTeacherOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_summary="Completion of a subject",
+        operation_description="Allows a teacher to finish an assigned subject. You must send a JSON with the completion data.",
+        request_body=FinalizeSubjectSerializer,
+        responses={
+            200: openapi.Response("Materia finalizada con éxito."),
+            403: openapi.Response("Solo los profesores pueden finalizar materias."),
+            404: openapi.Response("Materia no encontrada o no pertenece al profesor."),
+            400: "Error de validación en los datos enviados."
+        }
+    )
     def patch(self, request, subject_id):
         user = request.user
 
