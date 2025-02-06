@@ -13,6 +13,12 @@ class Registration(models.Model):
     def clean(self):
         if self.student_id.rol != 'alumno':
             raise ValidationError("El usuario debe tener el rol de 'Alumno' para inscribirse en una materia.")
+        # Obtener los prerequisitos de la materia que intenta inscribir
+        # prerequisites = self.subject_id.prerequisitos.all()
+
+        # for prereq in prerequisites:
+        #     if not Registration.objects.filter(student_id=self.student_id, subject_id=prereq, final_rating__gte=3.0).exists():
+        #         raise ValidationError(f"No puedes inscribirte en {self.subject_id} sin haber aprobado {prereq}.")
 
     def save(self, *args, **kwargs):
         self.clean()  

@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'alternova.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'dev': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'alternova-db',
         'USER': 'postgres',
@@ -99,7 +99,7 @@ DATABASES = {
         'HOST': 'localhost',  
         'PORT': '5432',       
     },
-    'default': {# Prod
+    'prod': {# Prod
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DATABASE_NAME', 'alternova-db'),
         'USER': os.getenv('DATABASE_USER', 'db_user'),
